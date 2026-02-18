@@ -20,7 +20,7 @@ export default {
                     overflow: hidden;
                     border-radius: 8px;
                 ">
-                    <svg class="s4-space-svg" viewBox="0 0 520 380" style="width: 100%; height: auto; max-height: 240px; overflow: hidden;"></svg>
+                    <svg class="s4-space-svg" viewBox="0 0 520 380" style="width: 100%; height: auto; max-height: 240px; overflow: visible;"></svg>
                     <!-- Typed formula below the SVG -->
                     <div class="s4-formula" style="
                         text-align: center;
@@ -57,7 +57,7 @@ export default {
                         color: var(--text-accent);
                         font-weight: 600;
                     ">Which words matter to each other?</div>
-                    <svg class="attention-svg" viewBox="0 0 700 200" style="width: 100%; height: auto; max-height: 140px; overflow: hidden;"></svg>
+                    <svg class="attention-svg" viewBox="0 0 700 200" style="width: 100%; height: auto; max-height: 140px; overflow: visible;"></svg>
 
                     <!-- Layer diagram -->
                     <div class="s4-layer-diagram" style="

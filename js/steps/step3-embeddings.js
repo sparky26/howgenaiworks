@@ -192,6 +192,8 @@ export default {
             delay: 1.2,
             ease: 'power2.in',
         });
+        // Collapse out of layout so scatter plot gets full visual space
+        tl.set('.s3-token-transform', { display: 'none' });
 
         tl.to('.s3-scatter-container', {
             opacity: 1,
