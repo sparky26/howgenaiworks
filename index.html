@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Generative AI Works — An Interactive Explainer</title>
+    <meta name="description" content="An interactive, step-by-step animation explaining how Generative AI and Large Language Models work — from raw text to tokenization, embeddings, and next-word prediction.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+    <!-- GSAP -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+    <!-- D3.js -->
+    <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Progress Bar -->
+    <div id="progress-bar" style="width: 0%"></div>
+
+    <!-- Top Navigation -->
+    <nav id="top-nav">
+        <div class="logo">How <span>GenAI</span> Works</div>
+        <div class="step-pills" id="step-pills">
+            <button class="step-pill active" data-step="0">1<span class="tooltip">Raw Text</span></button>
+            <button class="step-pill" data-step="1">2<span class="tooltip">Breaking It Down</span></button>
+            <button class="step-pill" data-step="2">3<span class="tooltip">Meaning as Numbers</span></button>
+            <button class="step-pill" data-step="3">4<span class="tooltip">Finding Connections</span></button>
+            <button class="step-pill" data-step="4">5<span class="tooltip">Predicting Words</span></button>
+            <button class="step-pill" data-step="5">6<span class="tooltip">Scale</span></button>
+            <button class="step-pill" data-step="6">7<span class="tooltip">Key Takeaways</span></button>
+        </div>
+        <span class="step-label" id="step-label"></span>
+    </nav>
+
+    <!-- Main Stage -->
+    <main id="stage">
+        <!-- Step content is injected here by JS -->
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <footer id="bottom-bar">
+        <button class="nav-btn" id="btn-prev" disabled>
+            <span>&#8592;</span> Previous
+        </button>
+        <span class="step-counter" id="step-counter">Step 1 of 7</span>
+        <button class="nav-btn primary" id="btn-next">
+            Next <span>&#8594;</span>
+        </button>
+    </footer>
+
+    <!-- App Entry Point -->
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

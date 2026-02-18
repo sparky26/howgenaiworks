@@ -1,0 +1,41 @@
+:root {
+    /* Background layers */
+    --bg-deep: #0a0a0f;
+    --bg-surface: #12121a;
+    --bg-elevated: #1a1a2e;
+
+    /* Text */
+    --text-primary: #e8e8f0;
+    --text-secondary: #8888a0;
+    --text-accent: #ffffff;
+
+    /* Step accent colors */
+    --accent-blue: #4a9eff;
+    --accent-cyan: #00d4ff;
+    --accent-purple: #a855f7;
+    --accent-pink: #ec4899;
+    --accent-green: #22c55e;
+    --accent-orange: #f97316;
+    --accent-gold: #fbbf24;
+
+    /* Current step accent (updated via JS) */
+    --step-accent: var(--accent-blue);
+
+    /* Utility */
+    --glow: rgba(74, 158, 255, 0.15);
+    --grid-line: rgba(255, 255, 255, 0.03);
+
+    /* Typography */
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Spacing */
+    --nav-height: 60px;
+    --bottom-bar-height: 70px;
+    --stage-max-width: 1000px;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.4s ease;
+}
