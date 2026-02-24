@@ -675,6 +675,20 @@ html, body {
     max-height: 280px;
 }
 
+
+/* === STEP 4 CONTAINERS === */
+.s4-vector-space,
+.s4-attention-section {
+    overflow: visible;
+}
+
+.s4-vector-space-inner,
+.s4-attention-section-inner {
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
 /* === ATTENTION ARCS === */
 .attention-svg {
     width: 100%;
