@@ -34,11 +34,14 @@ export class TimelineController {
         });
 
         document.addEventListener('keydown', (e) => {
+            // Ignore auto-repeated keydown events while a key is held
+            if (e.repeat) return;
+
             // Don't capture keys when an interactive element is focused
             const tag = e.target.tagName;
             if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
-            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            if (e.key === 'ArrowRight') {
                 e.preventDefault();
                 this.next();
             } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
