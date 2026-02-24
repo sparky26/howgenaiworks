@@ -7,8 +7,12 @@ export default {
     _pulseTween: null,
 
     build(container) {
-        const style = document.createElement('style');
-        style.textContent = `
+        const styleId = 'step7-styles';
+        let style = document.getElementById(styleId);
+        if (!style) {
+            style = document.createElement('style');
+            style.id = styleId;
+            style.textContent = `
             /* ---- Background breathing gradient ---- */
             @keyframes s7-breathe {
                 0%   { background-position: 0% 50%; opacity: 0.3; }
@@ -196,6 +200,8 @@ export default {
                 }
             }
         `;
+            document.head.appendChild(style);
+        }
 
         // Build the word-by-word headline
         // "It doesn't understand. It predicts what comes next."
@@ -249,7 +255,6 @@ export default {
             <p class="step-narration">${NARRATIONS.step7}</p>
         `;
 
-        wrapper.prepend(style);
         container.appendChild(wrapper);
     },
 

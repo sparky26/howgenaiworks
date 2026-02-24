@@ -9,12 +9,12 @@ export default {
     _neuralSpeed: 1,
 
     build(container) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'step-container';
-
-        // Inject scoped styles
-        const style = document.createElement('style');
-        style.textContent = `
+        const styleId = 'step5-styles';
+        let style = document.getElementById(styleId);
+        if (!style) {
+            style = document.createElement('style');
+            style.id = styleId;
+            style.textContent = `
             .s5-neural-canvas {
                 width: min(260px, 70vw);
                 height: 60px;
@@ -266,7 +266,11 @@ export default {
                 50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.35), 0 0 40px rgba(34, 197, 94, 0.15); }
             }
         `;
+            document.head.appendChild(style);
+        }
 
+        const wrapper = document.createElement('div');
+        wrapper.className = 'step-container';
         wrapper.innerHTML = `
             <div class="step-subtitle">Step 5</div>
             <h1 class="step-title">Predicting the Next Word</h1>
@@ -295,7 +299,6 @@ export default {
             <p class="step-narration">${NARRATIONS.step5}</p>
         `;
 
-        wrapper.prepend(style);
         container.appendChild(wrapper);
     },
 
