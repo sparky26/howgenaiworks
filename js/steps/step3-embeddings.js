@@ -105,7 +105,7 @@ export default {
                     opacity: 0;
                     position: relative;
                 ">
-                    <svg class="scatter-plot" viewBox="0 0 620 400" style="width: 100%; max-height: 280px; overflow: visible;"></svg>
+                    <svg class="scatter-plot" viewBox="0 0 620 400"></svg>
                 </div>
             </div>
             <p class="step-narration">${NARRATIONS.step3}</p>
