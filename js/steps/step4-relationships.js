@@ -1,9 +1,7 @@
+import { trackTimeout, clearTrackedTimeouts, trackTween, killTrackedTweens, cleanupGsapSelectors } from './step-lifecycle.js';
 import { NARRATIONS } from '../config.js';
 
 export default {
-    _timeouts: [],
-    _particleTweens: [],
-    _floatTweens: [],
 
     build(container) {
         const wrapper = document.createElement('div');
@@ -302,7 +300,7 @@ export default {
                 .text(p.label);
 
             // Staggered pop-in
-            this._timeouts.push(setTimeout(() => {
+            trackTimeout(this, setTimeout(() => {
                 orbG.select('.s4-orb-core')
                     .transition().duration(500)
                     .ease(d3.easeElasticOut.amplitude(1).period(0.4))
@@ -335,7 +333,7 @@ export default {
         // Delay to allow orbs to finish appearing
         const baseDelay = 1200;
 
-        this._timeouts.push(setTimeout(() => {
+        trackTimeout(this, setTimeout(() => {
             // Arrow path from Man to King
             const arrowPath = g.append('line')
                 .attr('class', 's4-royalty-arrow')
@@ -374,7 +372,7 @@ export default {
         }, baseDelay));
 
         // ---- Step B: Arrow "minus" Man, "plus" formula ----
-        this._timeouts.push(setTimeout(() => {
+        trackTimeout(this, setTimeout(() => {
             gsap.to('.s4-f-minus', { opacity: 1, duration: 0.2 });
             gsap.to('.s4-f-man', { opacity: 1, duration: 0.3, delay: 0.1 });
             gsap.to('.s4-f-plus', { opacity: 1, duration: 0.2, delay: 0.3 });
@@ -382,7 +380,7 @@ export default {
         }, baseDelay + 1000));
 
         // ---- Step C: Duplicate arrow, fly it to Woman's position ----
-        this._timeouts.push(setTimeout(() => {
+        trackTimeout(this, setTimeout(() => {
             // The arrow vector: direction from Man to King
             const dx = kingP.cx - manP.cx;
             const dy = kingP.cy - manP.cy;
@@ -417,7 +415,7 @@ export default {
         }, baseDelay + 2200));
 
         // ---- Step D: Arrow tip lands on Queen -- flash effect ----
-        this._timeouts.push(setTimeout(() => {
+        trackTimeout(this, setTimeout(() => {
             const queenOrb = g.select('.s4-orb-queen');
 
             // Queen orb PULSES with bright flash
@@ -614,23 +612,14 @@ export default {
                     },
                 });
 
-                this._particleTweens.push(tw);
+                trackTween(this, tw, 'particleTweens');
             }
         });
     },
 
     cleanup() {
-        // Clear all timeouts
-        this._timeouts.forEach(tid => clearTimeout(tid));
-        this._timeouts = [];
-
-        // Kill particle tweens
-        this._particleTweens.forEach(tw => tw.kill());
-        this._particleTweens = [];
-
-        // Kill float tweens
-        this._floatTweens.forEach(tw => tw.kill());
-        this._floatTweens = [];
+        clearTrackedTimeouts(this);
+        killTrackedTweens(this);
 
         // Clean up stored references
         this._arcPaths = [];
@@ -641,16 +630,17 @@ export default {
         d3.select('.s4-space-svg').selectAll('*').remove();
         d3.select('.attention-svg').selectAll('*').remove();
 
-        // Kill any lingering GSAP tweens
-        gsap.killTweensOf('.s4-f-king');
-        gsap.killTweensOf('.s4-f-minus');
-        gsap.killTweensOf('.s4-f-man');
-        gsap.killTweensOf('.s4-f-plus');
-        gsap.killTweensOf('.s4-f-woman');
-        gsap.killTweensOf('.s4-f-equals');
-        gsap.killTweensOf('.s4-f-queen');
-        gsap.killTweensOf('.s4-vector-space');
-        gsap.killTweensOf('.s4-attention-section');
-        gsap.killTweensOf('.s4-layer-diagram');
+        cleanupGsapSelectors([
+            '.s4-f-king',
+            '.s4-f-minus',
+            '.s4-f-man',
+            '.s4-f-plus',
+            '.s4-f-woman',
+            '.s4-f-equals',
+            '.s4-f-queen',
+            '.s4-vector-space',
+            '.s4-attention-section',
+            '.s4-layer-diagram',
+        ]);
     },
 };

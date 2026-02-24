@@ -1,10 +1,7 @@
+import { clearTrackedTimeouts, trackTween, killTrackedTweens, cleanupGsapSelectors } from './step-lifecycle.js';
 import { NARRATIONS } from '../config.js';
 
 export default {
-    _timeouts: [],
-    _independentTweens: [],
-    _floatTweens: [],
-    _pulseTween: null,
     _replayCleanup: null,
 
     build(container) {
@@ -313,7 +310,7 @@ export default {
                 yoyo: true,
                 repeat: -1,
             });
-            this._independentTweens.push(glowPulse);
+            trackTween(this, glowPulse, 'independentTweens');
         });
 
         // ---- Takeaway cards slide in from below ----
@@ -343,7 +340,7 @@ export default {
                     yoyo: true,
                     repeat: -1,
                 });
-                this._floatTweens.push(floatTween);
+                trackTween(this, floatTween, 'floatTweens');
             });
         });
 
@@ -371,37 +368,13 @@ export default {
             this._replayCleanup = null;
         }
 
-        // Clear all timeouts
-        this._timeouts.forEach(tid => clearTimeout(tid));
-        this._timeouts = [];
-
-        // Kill independent tweens (glow pulse, etc.)
-        this._independentTweens.forEach(tw => {
-            if (tw && typeof tw.kill === 'function') tw.kill();
-        });
-        this._independentTweens = [];
-
-        // Kill float tweens
-        this._floatTweens.forEach(tw => {
-            if (tw && typeof tw.kill === 'function') tw.kill();
-        });
-        this._floatTweens = [];
-
-        // Kill pulse tween
-        if (this._pulseTween) {
-            this._pulseTween.kill();
-            this._pulseTween = null;
-        }
+        clearTrackedTimeouts(this);
+        killTrackedTweens(this);
 
         // Remove pulse class from button
         const btn = document.getElementById('s7-replay');
         if (btn) btn.classList.remove('s7-replay-pulse');
 
-        // Kill GSAP tweens on our elements
-        gsap.killTweensOf('.s7-word');
-        gsap.killTweensOf('.s7-card');
-        gsap.killTweensOf('#s7-glow');
-        gsap.killTweensOf('#s7-replay');
-        gsap.killTweensOf('.s7-headline');
+        cleanupGsapSelectors(['.s7-word', '.s7-card', '#s7-glow', '#s7-replay', '.s7-headline']);
     },
 };
