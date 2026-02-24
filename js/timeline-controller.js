@@ -1,11 +1,8 @@
-import { STEP_COLORS, STEP_NAMES } from './config.js';
-
 export class TimelineController {
-    constructor(particleBg) {
+    constructor(particleBg, stepRegistry = []) {
         this.currentStep = -1;
-        this.totalSteps = 7;
         this.isAnimating = false;
-        this.steps = [];
+        this.steps = stepRegistry;
         this.currentTimeline = null;
         this.pendingStep = null;
         this.particleBg = particleBg;
@@ -16,13 +13,13 @@ export class TimelineController {
         this.stepCounter = document.getElementById('step-counter');
         this.btnPrev = document.getElementById('btn-prev');
         this.btnNext = document.getElementById('btn-next');
-        this.pills = document.querySelectorAll('.step-pill');
+        this.pills = Array.from(document.querySelectorAll('.step-pill'));
 
         this.bindEvents();
     }
 
-    registerStep(stepModule) {
-        this.steps.push(stepModule);
+    get totalSteps() {
+        return this.steps.length;
     }
 
     bindEvents() {
@@ -47,9 +44,12 @@ export class TimelineController {
             } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
                 e.preventDefault();
                 this.prev();
-            } else if (e.key >= '1' && e.key <= '7') {
-                e.preventDefault();
-                this.goToStep(parseInt(e.key) - 1);
+            } else if (/^[1-9]$/.test(e.key)) {
+                const stepIndex = parseInt(e.key) - 1;
+                if (stepIndex < this.totalSteps) {
+                    e.preventDefault();
+                    this.goToStep(stepIndex);
+                }
             }
         });
     }
@@ -73,7 +73,7 @@ export class TimelineController {
                 this.currentTimeline = null;
             }
             await this.exitStep(this.currentStep, direction);
-            this.steps[this.currentStep].cleanup();
+            this.steps[this.currentStep].module.cleanup();
         }
 
         this.currentStep = index;
@@ -82,7 +82,7 @@ export class TimelineController {
         this.stage.classList.toggle('stage-overflow-visible', showStageOverflow);
 
         // Update accent color
-        const color = STEP_COLORS[index];
+        const color = this.steps[index].color;
         document.documentElement.style.setProperty('--step-accent', color);
         if (this.particleBg) {
             this.particleBg.setAccentColor(color);
@@ -90,10 +90,10 @@ export class TimelineController {
 
         // Clear and build new step
         this.stage.innerHTML = '';
-        this.steps[index].build(this.stage);
+        this.steps[index].module.build(this.stage);
 
         // Enter new step
-        this.currentTimeline = this.steps[index].enter();
+        this.currentTimeline = this.steps[index].module.enter();
         this.updateUI();
 
         if (this.currentTimeline) {
@@ -162,7 +162,7 @@ export class TimelineController {
         if (i === this.totalSteps - 1) {
             this.btnNext.innerHTML = 'Replay <span>&#8635;</span>';
         } else {
-            this.btnNext.innerHTML = `Next: ${STEP_NAMES[i + 1]} <span>&#8594;</span>`;
+            this.btnNext.innerHTML = `Next: ${this.steps[i + 1].name} <span>&#8594;</span>`;
         }
 
         // Pills

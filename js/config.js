@@ -1,22 +1,23 @@
-export const STEP_COLORS = [
-    '#4a9eff', // Step 1: Raw Text - blue
-    '#00d4ff', // Step 2: Tokenization - cyan
-    '#a855f7', // Step 3: Embeddings - purple
-    '#ec4899', // Step 4: Relationships - pink
-    '#22c55e', // Step 5: Prediction - green
-    '#f97316', // Step 6: Scaling - orange
-    '#fbbf24', // Step 7: Conclusion - gold
+import step1 from './steps/step1-raw-text.js';
+import step2 from './steps/step2-tokenization.js';
+import step3 from './steps/step3-embeddings.js';
+import step4 from './steps/step4-relationships.js';
+import step5 from './steps/step5-prediction.js';
+import step6 from './steps/step6-scaling.js';
+import step7 from './steps/step7-conclusion.js';
+
+export const STEPS = [
+    { id: 'step1', name: 'Raw Text', color: '#4a9eff', module: step1 },
+    { id: 'step2', name: 'Breaking It Down', color: '#00d4ff', module: step2 },
+    { id: 'step3', name: 'Meaning as Numbers', color: '#a855f7', module: step3 },
+    { id: 'step4', name: 'Finding Connections', color: '#ec4899', module: step4 },
+    { id: 'step5', name: 'Predicting Words', color: '#22c55e', module: step5 },
+    { id: 'step6', name: 'Scale', color: '#f97316', module: step6 },
+    { id: 'step7', name: 'Key Takeaways', color: '#fbbf24', module: step7 },
 ];
 
-export const STEP_NAMES = [
-    'Raw Text',
-    'Breaking It Down',
-    'Meaning as Numbers',
-    'Finding Connections',
-    'Predicting Words',
-    'Scale',
-    'Key Takeaways',
-];
+export const STEP_COLORS = STEPS.map(step => step.color);
+export const STEP_NAMES = STEPS.map(step => step.name);
 
 export const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog. Every morning, the fox would leap across the meadow, chasing patterns in the tall grass.";
 
@@ -118,6 +119,7 @@ export const PREDICTION_ROUNDS = [
 ];
 
 export const NARRATIONS = {
+
     step1: `This is how language starts for a computer — as <em>raw text</em>. Just characters on a screen. The machine has no idea what these words mean. It cannot read. It has no concept of language, grammar, or meaning. Everything that follows is about turning this raw text into <em>math the machine can work with</em>.`,
 
     step2: `First, the text gets chopped into small pieces called <em>tokens</em>. Think of this as the AI's alphabet — but instead of single letters, tokens are common chunks of text. Notice that "morning" becomes "morn" + "ing" — the model works with <em>fragments, not whole words</em>. Every token is assigned a number. This is all the model ever sees: <em>a sequence of numbers</em>. Not words, not meaning — just numbers.`,
