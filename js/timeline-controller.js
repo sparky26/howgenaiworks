@@ -7,6 +7,7 @@ export class TimelineController {
         this.isAnimating = false;
         this.steps = [];
         this.currentTimeline = null;
+        this.pendingStep = null;
         this.particleBg = particleBg;
 
         // DOM refs
@@ -57,14 +58,12 @@ export class TimelineController {
         if (index < 0 || index >= this.totalSteps || index === this.currentStep) return;
 
         if (this.isAnimating) {
-            // Fast-forward current animation
-            if (this.currentTimeline) {
-                this.currentTimeline.progress(1);
-            }
-            this.isAnimating = false;
+            this.pendingStep = index;
+            return;
         }
 
         this.isAnimating = true;
+        this.pendingStep = null;
         const direction = index > this.currentStep ? 1 : -1;
 
         // Exit current step
@@ -100,10 +99,20 @@ export class TimelineController {
         if (this.currentTimeline) {
             this.currentTimeline.eventCallback('onComplete', () => {
                 this.isAnimating = false;
+                this.flushPendingStep();
             });
         } else {
             this.isAnimating = false;
+            this.flushPendingStep();
         }
+    }
+
+
+    flushPendingStep() {
+        if (this.pendingStep === null || this.pendingStep === this.currentStep) return;
+        const nextStep = this.pendingStep;
+        this.pendingStep = null;
+        this.goToStep(nextStep);
     }
 
     exitStep(index, direction) {
