@@ -9,7 +9,7 @@ export default {
         wrapper.innerHTML = `
             <div class="step-subtitle">Step 4</div>
             <h1 class="step-title">Finding Patterns in Language</h1>
-            <div class="step-visual" style="flex-direction: column; gap: 16px;">
+            <div class="step-visual" style="flex-direction: column; gap: 16px; justify-content: flex-start; padding-top: clamp(8px, 1.5vh, 16px);">
                 <!-- Phase 1: 2D vector space with vector arithmetic -->
                 <div class="s4-vector-space" style="
                     width: 100%;
