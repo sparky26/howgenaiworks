@@ -17,10 +17,10 @@ export default {
                     width: 100%;
                     max-width: 560px;
                     position: relative;
-                    overflow: hidden;
-                    border-radius: 8px;
                 ">
-                    <svg class="s4-space-svg" viewBox="0 0 520 380" style="width: 100%; height: auto; max-height: 240px; overflow: visible;"></svg>
+                    <div class="s4-vector-space-inner">
+                        <svg class="s4-space-svg" viewBox="0 0 520 380" style="width: 100%; height: auto; max-height: 240px; overflow: visible;"></svg>
+                    </div>
                     <!-- Typed formula below the SVG -->
                     <div class="s4-formula" style="
                         text-align: center;
@@ -49,7 +49,6 @@ export default {
                     width: 100%;
                     max-width: 720px;
                     opacity: 0;
-                    overflow: hidden;
                 ">
                     <div class="s4-attention-label" style="
                         font-family: var(--font-heading);
@@ -57,7 +56,9 @@ export default {
                         color: var(--text-accent);
                         font-weight: 600;
                     ">Which words matter to each other?</div>
-                    <svg class="attention-svg" viewBox="0 0 700 200" style="width: 100%; height: auto; max-height: 140px; overflow: visible;"></svg>
+                    <div class="s4-attention-section-inner">
+                        <svg class="attention-svg" viewBox="0 0 700 200" style="width: 100%; height: auto; max-height: 140px; overflow: visible;"></svg>
+                    </div>
 
                     <!-- Layer diagram -->
                     <div class="s4-layer-diagram" style="
