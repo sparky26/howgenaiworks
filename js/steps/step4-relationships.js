@@ -82,84 +82,107 @@ export default {
     },
 
     enter() {
-        const tl = gsap.timeline();
+        this._substepIndex = 0;
+        this._substepCount = 3;
+        this._attentionBuilt = false;
 
-        // ------------------------------------------------------------------
-        // Phase 0: Header
-        // ------------------------------------------------------------------
+        const tl = gsap.timeline();
         tl.from('.step-subtitle', { opacity: 0, y: 20, duration: 0.4 });
         tl.from('.step-title', { opacity: 0, y: 20, duration: 0.4 }, '-=0.2');
-
-        // ------------------------------------------------------------------
-        // Phase 1: Build the 2D vector space with grid and orbs
-        // ------------------------------------------------------------------
-        tl.call(() => this._buildVectorSpace());
-        tl.to({}, { duration: 0.8 }); // wait for orbs to appear
-
-        // ------------------------------------------------------------------
-        // Phase 2: Vector arithmetic animation sequence
-        // ------------------------------------------------------------------
-        tl.call(() => this._animateVectorArithmetic());
-        tl.to({}, { duration: 6.5 }); // time for the full arithmetic sequence
-
-        // ------------------------------------------------------------------
-        // Phase 3: Transition to attention section
-        // ------------------------------------------------------------------
-        tl.to('.s4-vector-space', {
-            opacity: 0.3,
-            scale: 0.9,
-            y: -10,
-            duration: 0.5,
-            ease: 'power2.in',
-        });
-        tl.to('.s4-vector-space', {
-            opacity: 0,
-            duration: 0.3,
-            display: 'none',
-        });
-
-        tl.to('.s4-attention-section', {
-            opacity: 1,
-            duration: 0.5,
-        });
-
-        // ------------------------------------------------------------------
-        // Phase 4: Build attention visualization
-        // ------------------------------------------------------------------
-        tl.call(() => this._buildAttentionViz());
-        tl.to({}, { duration: 2.8 }); // wait for arcs to draw
-
-        // ------------------------------------------------------------------
-        // Phase 5: Spawn flowing particles on attention arcs (independent tweens)
-        // ------------------------------------------------------------------
-        tl.call(() => this._spawnAttentionParticles());
-
-        // ------------------------------------------------------------------
-        // Phase 6: Layer diagram slides in from below
-        // ------------------------------------------------------------------
-        tl.to('.s4-layer-diagram', {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            ease: 'power3.out',
-        });
-        tl.from('.s4-layer-diagram .layer-block', {
-            opacity: 0,
-            y: 15,
-            stagger: 0.25,
-            duration: 0.4,
-        }, '-=0.3');
-
-        // ------------------------------------------------------------------
-        // Phase 7: Narration
-        // ------------------------------------------------------------------
-        tl.from('.step-narration', { opacity: 0, y: 20, duration: 0.6 });
-
+        tl.call(() => this._showSubstep(0, true));
         return tl;
+    },
+
+    getNavigationState() {
+        if (this._substepCount === undefined || this._substepIndex === undefined) return null;
+
+        if (this._substepIndex < this._substepCount - 1) {
+            return {
+                prevDisabled: this._substepIndex === 0,
+                nextLabel: 'Next Animation',
+            };
+        }
+
+        return {
+            prevDisabled: false,
+            nextLabel: null,
+        };
+    },
+
+    handleNext() {
+        if (this._substepIndex >= this._substepCount - 1) return false;
+        this._showSubstep(this._substepIndex + 1);
+        return true;
+    },
+
+    handlePrev() {
+        if (this._substepIndex <= 0) return false;
+        this._showSubstep(this._substepIndex - 1, false);
+        return true;
+    },
+
+    _showSubstep(index, forward = true) {
+        this._substepIndex = index;
+        clearTrackedTimeouts(this);
+        killTrackedTweens(this, 'particleTweens');
+        cleanupGsapSelectors(['.s4-f-king', '.s4-f-minus', '.s4-f-man', '.s4-f-plus', '.s4-f-woman', '.s4-f-equals', '.s4-f-queen']);
+
+        if (index === 0) {
+            gsap.set('.s4-attention-section', { opacity: 0, display: 'none' });
+            gsap.set('.s4-vector-space', { opacity: 1, display: 'block', scale: 1, y: 0 });
+            this._buildVectorSpace();
+            this._animateVectorArithmetic();
+            gsap.set('.step-narration', { opacity: 0, y: 20 });
+            return;
+        }
+
+        if (index === 1) {
+            gsap.timeline()
+                .to('.s4-vector-space', {
+                    opacity: 0,
+                    y: -8,
+                    duration: forward ? 0.35 : 0,
+                    display: 'none',
+                    ease: 'power2.inOut',
+                })
+                .set('.s4-attention-section', { display: 'block' })
+                .to('.s4-attention-section', { opacity: 1, duration: 0.35 })
+                .call(() => {
+                    this._buildAttentionViz();
+                    this._spawnAttentionParticles();
+                });
+            gsap.set('.s4-layer-diagram', { opacity: 0, y: 30 });
+            gsap.set('.step-narration', { opacity: 0, y: 20 });
+            return;
+        }
+
+        gsap.set('.s4-vector-space', { opacity: 0, display: 'none' });
+        gsap.set('.s4-attention-section', { opacity: 1, display: 'block' });
+
+        if (!this._attentionBuilt) {
+            this._buildAttentionViz();
+        }
+        this._spawnAttentionParticles();
+
+        gsap.timeline()
+            .to('.s4-layer-diagram', {
+                opacity: 1,
+                y: 0,
+                duration: 0.5,
+                ease: 'power3.out',
+            })
+            .from('.s4-layer-diagram .layer-block', {
+                opacity: 0,
+                y: 15,
+                stagger: 0.2,
+                duration: 0.3,
+            }, '-=0.2')
+            .to('.step-narration', { opacity: 1, y: 0, duration: 0.4 }, '-=0.1');
     },
 
     _buildVectorSpace() {
         const svg = d3.select('.s4-space-svg');
+        svg.selectAll('*').remove();
         const width = 520, height = 380;
         const margin = { top: 20, right: 20, bottom: 20, left: 20 };
         const innerW = width - margin.left - margin.right;
@@ -469,6 +492,7 @@ export default {
 
     _buildAttentionViz() {
         const svg = d3.select('.attention-svg');
+        svg.selectAll('*').remove();
         const words = ['The', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'];
         const wordWidth = 85;
         const startX = 350 - (words.length * wordWidth) / 2;
@@ -563,12 +587,12 @@ export default {
                 totalLength: totalLength,
             });
         });
+
+        this._attentionBuilt = true;
     },
 
     _spawnAttentionParticles() {
         // Create flowing particles along each attention arc as independent infinite tweens
-        const svg = d3.select('.attention-svg');
-
         if (!this._arcPaths) return;
 
         this._arcPaths.forEach((arcData, arcIdx) => {

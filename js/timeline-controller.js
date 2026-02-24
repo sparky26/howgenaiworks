@@ -137,6 +137,12 @@ export class TimelineController {
     }
 
     next() {
+        const activeModule = this.steps[this.currentStep]?.module;
+        if (activeModule?.handleNext?.()) {
+            this.updateUI();
+            return;
+        }
+
         if (this.currentStep < this.totalSteps - 1) {
             this.goToStep(this.currentStep + 1);
         } else {
@@ -146,6 +152,12 @@ export class TimelineController {
     }
 
     prev() {
+        const activeModule = this.steps[this.currentStep]?.module;
+        if (activeModule?.handlePrev?.()) {
+            this.updateUI();
+            return;
+        }
+
         if (this.currentStep > 0) {
             this.goToStep(this.currentStep - 1);
         }
@@ -161,8 +173,13 @@ export class TimelineController {
         this.stepCounter.textContent = `Step ${i + 1} of ${this.totalSteps}`;
 
         // Nav buttons
-        this.btnPrev.disabled = i === 0;
-        if (i === this.totalSteps - 1) {
+        const activeModule = this.steps[i]?.module;
+        const navState = activeModule?.getNavigationState?.() || null;
+
+        this.btnPrev.disabled = navState?.prevDisabled ?? i === 0;
+        if (navState?.nextLabel) {
+            this.btnNext.innerHTML = `${navState.nextLabel} <span>&#8594;</span>`;
+        } else if (i === this.totalSteps - 1) {
             this.btnNext.innerHTML = 'Replay <span>&#8635;</span>';
         } else {
             this.btnNext.innerHTML = `Next: ${this.steps[i + 1].name} <span>&#8594;</span>`;
