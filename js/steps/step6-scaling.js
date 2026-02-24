@@ -9,8 +9,12 @@ export default {
     _canvasRunning: false,
 
     build(container) {
-        const style = document.createElement('style');
-        style.textContent = `
+        const styleId = 'step6-styles';
+        let style = document.getElementById(styleId);
+        if (!style) {
+            style = document.createElement('style');
+            style.id = styleId;
+            style.textContent = `
             .s6-wrapper {
                 width: 100%;
                 display: flex;
@@ -106,6 +110,8 @@ export default {
                 }
             }
         `;
+            document.head.appendChild(style);
+        }
 
         const wrapper = document.createElement('div');
         wrapper.className = 'step-container';
@@ -129,7 +135,6 @@ export default {
             <p class="step-narration">${NARRATIONS.step6}</p>
         `;
 
-        wrapper.prepend(style);
         container.appendChild(wrapper);
     },
 
