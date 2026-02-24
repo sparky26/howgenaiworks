@@ -672,7 +672,8 @@ html, body {
     width: 100%;
     max-width: 600px;
     height: auto;
-    max-height: 280px;
+    max-height: clamp(220px, 34vh, 320px);
+    overflow: visible;
 }
 
 
@@ -689,9 +690,34 @@ html, body {
     overflow: hidden;
 }
 
+.s4-space-svg {
+    width: 100%;
+    height: auto;
+    max-height: clamp(220px, 30vh, 300px);
+    overflow: visible;
+}
+
+.s4-attention-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 720px;
+    padding-top: clamp(10px, 2vh, 18px);
+    padding-bottom: clamp(14px, 3vh, 26px);
+}
+
+.s4-attention-section-inner {
+    padding-top: clamp(12px, 2.6vh, 24px);
+    padding-bottom: clamp(16px, 3.2vh, 30px);
+}
+
 /* === ATTENTION ARCS === */
 .attention-svg {
     width: 100%;
+    height: auto;
+    max-height: clamp(150px, 24vh, 220px);
     overflow: visible;
 }
 
@@ -759,6 +785,28 @@ html, body {
     .card {
         max-width: 260px;
         padding: 20px;
+    }
+}
+
+
+/* -- Presentation layout (projectors / 1280x720) -- */
+@media (min-width: 1100px) and (max-height: 760px) {
+    .scatter-plot {
+        max-height: clamp(210px, 31vh, 270px);
+    }
+    .s4-space-svg {
+        max-height: clamp(210px, 29vh, 265px);
+    }
+    .attention-svg {
+        max-height: clamp(150px, 21vh, 185px);
+    }
+    .s4-attention-section {
+        padding-top: clamp(14px, 2.4vh, 20px);
+        padding-bottom: clamp(18px, 3.2vh, 28px);
+    }
+    .s4-attention-section-inner {
+        padding-top: clamp(14px, 2.8vh, 22px);
+        padding-bottom: clamp(18px, 3.4vh, 30px);
     }
 }
 
@@ -869,7 +917,13 @@ html, body {
     .scatter-plot {
         max-width: 100%;
         height: auto;
-        max-height: 220px;
+        max-height: clamp(180px, 30vh, 240px);
+    }
+    .s4-space-svg {
+        max-height: clamp(180px, 28vh, 240px);
+    }
+    .attention-svg {
+        max-height: clamp(135px, 22vh, 190px);
     }
     .param-counter {
         font-size: 24px;
