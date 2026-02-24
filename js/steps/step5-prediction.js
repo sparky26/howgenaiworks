@@ -1,9 +1,8 @@
+import { trackTimeout, clearTrackedTimeouts, trackTween, killTrackedTweens, cleanupGsapSelectors } from './step-lifecycle.js';
 import { PREDICTION_ROUNDS, NARRATIONS } from '../config.js';
 
 export default {
     _temperatureCleanup: null,
-    _timeouts: [],
-    _independentTweens: [],
     _animFrameId: null,
     _neuralRunning: false,
     _neuralSpeed: 1,
@@ -557,9 +556,9 @@ export default {
                     span.classList.remove('s5-char-flash');
                     span.classList.add('s5-char-settled');
                 }, 150);
-                this._timeouts.push(settleTid);
+                trackTimeout(this, settleTid);
             }, i * 40);
-            this._timeouts.push(tid);
+            trackTimeout(this, tid);
         });
     },
 
@@ -602,7 +601,7 @@ export default {
             const tid = setTimeout(() => {
                 // Fade in the bar row
                 const fadeIn = gsap.to(bar, { opacity: 1, duration: 0.25 });
-                this._independentTweens.push(fadeIn);
+                trackTween(this, fadeIn, 'independentTweens');
 
                 const fill = bar.querySelector('.s5-bar-fill');
                 const dot = bar.querySelector('.s5-bar-dot');
@@ -614,7 +613,7 @@ export default {
                     ease: 'elastic.out(1, 0.6)',
                     delay: 0.05,
                 });
-                this._independentTweens.push(fillTween);
+                trackTween(this, fillTween, 'independentTweens');
 
                 // Animate the leading dot
                 const dotTween = gsap.to(dot, {
@@ -624,12 +623,12 @@ export default {
                     onComplete: () => {
                         // Fade dot out after bar settles
                         const dotFade = gsap.to(dot, { opacity: 0, duration: 0.6, delay: 0.4 });
-                        this._independentTweens.push(dotFade);
+                        trackTween(this, dotFade, 'independentTweens');
                     },
                 });
-                this._independentTweens.push(dotTween);
+                trackTween(this, dotTween, 'independentTweens');
             }, i * 100);
-            this._timeouts.push(tid);
+            trackTimeout(this, tid);
         });
 
         // Pulse the top prediction bar (first child)
@@ -644,10 +643,10 @@ export default {
                     repeat: 3,
                     ease: 'sine.inOut',
                 });
-                this._independentTweens.push(pulseTween);
+                trackTween(this, pulseTween, 'independentTweens');
             }
         }, predictions.length * 100 + 900);
-        this._timeouts.push(pulseTid);
+        trackTimeout(this, pulseTid);
     },
 
     // ==========================================================================
@@ -751,14 +750,14 @@ export default {
                         onComplete: () => flash.remove(),
                     }
                 );
-                this._independentTweens.push(flashTween);
+                trackTween(this, flashTween, 'independentTweens');
 
                 // Clean up flyer and trails
                 flyer.remove();
                 trails.forEach(g => g.remove());
             },
         });
-        this._independentTweens.push(flyTween);
+        trackTween(this, flyTween, 'independentTweens');
     },
 
     // ==========================================================================
@@ -786,7 +785,7 @@ export default {
             stagger: 0.03,
             duration: 0.2,
         });
-        this._independentTweens.push(clearTl);
+        trackTween(this, clearTl, 'independentTweens');
     },
 
     // ==========================================================================
@@ -848,15 +847,8 @@ export default {
     // ==========================================================================
 
     cleanup() {
-        // Clear all timeouts
-        this._timeouts.forEach(tid => clearTimeout(tid));
-        this._timeouts = [];
-
-        // Kill all independent tweens / timelines
-        this._independentTweens.forEach(tw => {
-            if (tw && typeof tw.kill === 'function') tw.kill();
-        });
-        this._independentTweens = [];
+        clearTrackedTimeouts(this);
+        killTrackedTweens(this, 'independentTweens');
 
         // Stop neural canvas animation
         if (this._animFrameId) {
@@ -875,13 +867,14 @@ export default {
         // Remove any lingering flyer / trail / flash elements from body
         document.querySelectorAll('.s5-flying-word, .s5-trail-ghost, .s5-landing-flash').forEach(el => el.remove());
 
-        // Kill any GSAP tweens on our elements
-        gsap.killTweensOf('.s5-bar');
-        gsap.killTweensOf('.s5-bar-fill');
-        gsap.killTweensOf('.s5-bar-dot');
-        gsap.killTweensOf('#s5-input');
-        gsap.killTweensOf('#s5-neural-canvas');
-        gsap.killTweensOf('#s5-temp-slider');
-        gsap.killTweensOf('#s5-pred-label');
+        cleanupGsapSelectors([
+            '.s5-bar',
+            '.s5-bar-fill',
+            '.s5-bar-dot',
+            '#s5-input',
+            '#s5-neural-canvas',
+            '#s5-temp-slider',
+            '#s5-pred-label',
+        ]);
     },
 };

@@ -1,10 +1,7 @@
+import { clearTrackedTimeouts, trackTween, killTrackedTweens, cleanupGsapSelectors } from './step-lifecycle.js';
 import { SAMPLE_TEXT, NARRATIONS } from '../config.js';
 
 export default {
-    _timeouts: [],
-    _floatTweens: [],
-    _glowTween: null,
-
     build(container) {
         // Split text into words, then each word into character spans
         const words = SAMPLE_TEXT.split(' ');
@@ -220,19 +217,19 @@ export default {
                     yoyo: true,
                     repeat: -1,
                 });
-                this._floatTweens.push(tw);
+                trackTween(this, tw, 'floatTweens');
             });
         });
 
         // Start infinite glow pulse OUTSIDE the timeline via tl.call()
         tl.call(() => {
-            this._glowTween = gsap.to(glow, {
+            trackTween(this, gsap.to(glow, {
                 opacity: 0.4,
                 duration: 1.5,
                 ease: 'sine.inOut',
                 yoyo: true,
                 repeat: -1,
-            });
+            }), 'glowTweens');
         });
 
         // ------------------------------------------------------------------
@@ -248,25 +245,8 @@ export default {
     },
 
     cleanup() {
-        // Kill all independent float tweens
-        this._floatTweens.forEach(tw => tw.kill());
-        this._floatTweens = [];
-
-        // Kill glow tween
-        if (this._glowTween) {
-            this._glowTween.kill();
-            this._glowTween = null;
-        }
-
-        // Clear any timeouts
-        this._timeouts.forEach(tid => clearTimeout(tid));
-        this._timeouts = [];
-
-        // Kill any remaining tweens on our elements
-        gsap.killTweensOf('.s1-char');
-        gsap.killTweensOf('.s1-word');
-        gsap.killTweensOf('.s1-glow');
-        gsap.killTweensOf('.s1-beam');
-        gsap.killTweensOf('.s1-origin-dot');
+        clearTrackedTimeouts(this);
+        killTrackedTweens(this);
+        cleanupGsapSelectors(['.s1-char', '.s1-word', '.s1-glow', '.s1-beam', '.s1-origin-dot']);
     },
 };

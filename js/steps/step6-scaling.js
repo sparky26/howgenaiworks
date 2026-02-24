@@ -1,11 +1,10 @@
+import { trackTimeout, clearTrackedTimeouts, trackTween, killTrackedTweens, cleanupGsapSelectors } from './step-lifecycle.js';
 import { NARRATIONS } from '../config.js';
 
 export default {
     _animationId: null,
     _nodes: [],
     _shockwaves: [],
-    _timeouts: [],
-    _independentTweens: [],
     _canvasRunning: false,
 
     build(container) {
@@ -236,7 +235,7 @@ export default {
                 }
             },
         });
-        this._independentTweens.push(pulseTween);
+        trackTween(this, pulseTween, 'independentTweens');
 
         // Start render loop
         this._renderCanvas();
@@ -499,7 +498,7 @@ export default {
                 }
             },
         });
-        this._independentTweens.push(fadeTween);
+        trackTween(this, fadeTween, 'independentTweens');
 
         // Add shockwave ring
         this._shockwaves.push({
@@ -513,7 +512,7 @@ export default {
         if (counterEl) {
             counterEl.classList.add('s6-flash');
             const tid = setTimeout(() => counterEl.classList.remove('s6-flash'), 400);
-            this._timeouts.push(tid);
+            trackTimeout(this, tid);
         }
     },
 
@@ -548,7 +547,7 @@ export default {
             frame++;
 
             const tid = setTimeout(spinInterval, (spinDuration * 1000) / spinFrames);
-            this._timeouts.push(tid);
+            trackTimeout(this, tid);
         };
 
         spinInterval();
@@ -558,7 +557,7 @@ export default {
             { scale: 1.15 },
             { scale: 1, duration: 0.4, ease: 'elastic.out(1, 0.5)' }
         );
-        this._independentTweens.push(popTween);
+        trackTween(this, popTween, 'independentTweens');
     },
 
     // ======================================================================
@@ -572,15 +571,8 @@ export default {
             this._animationId = null;
         }
 
-        // Clear all timeouts
-        this._timeouts.forEach(tid => clearTimeout(tid));
-        this._timeouts = [];
-
-        // Kill all independent tweens
-        this._independentTweens.forEach(tw => {
-            if (tw && typeof tw.kill === 'function') tw.kill();
-        });
-        this._independentTweens = [];
+        clearTrackedTimeouts(this);
+        killTrackedTweens(this, 'independentTweens');
 
         // Reset state
         this._nodes = [];
@@ -588,10 +580,6 @@ export default {
         this._ctx = null;
         this._canvasEl = null;
 
-        // Kill any remaining GSAP tweens on our elements
-        gsap.killTweensOf('#s6-counter');
-        gsap.killTweensOf('.s6-canvas-wrap');
-        gsap.killTweensOf('.s6-stat');
-        gsap.killTweensOf('#s6-stats');
+        cleanupGsapSelectors(['#s6-counter', '.s6-canvas-wrap', '.s6-stat', '#s6-stats']);
     },
 };

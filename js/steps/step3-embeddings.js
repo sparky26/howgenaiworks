@@ -1,9 +1,7 @@
+import { trackTimeout, clearTrackedTimeouts, trackTween, killTrackedTweens, cleanupGsapSelectors } from './step-lifecycle.js';
 import { EMBEDDING_WORDS, EMBEDDING_CONNECTIONS, NARRATIONS } from '../config.js';
 
 export default {
-    _timeouts: [],
-    _breatheTweens: [],
-    _glowTweens: [],
 
     build(container) {
         const representativeTokens = [
@@ -359,7 +357,7 @@ export default {
                 .text(w.word);
 
             // Staggered pop-in animation
-            this._timeouts.push(setTimeout(() => {
+            trackTimeout(this, setTimeout(() => {
                 // Core orb pops in with elastic ease
                 orbGroup.select('.orb-core')
                     .transition().duration(500)
@@ -418,7 +416,7 @@ export default {
                 .attr('opacity', 0)
                 .text(`dist: ${conn.label}`);
 
-            this._timeouts.push(setTimeout(() => {
+            trackTimeout(this, setTimeout(() => {
                 line.transition().duration(700)
                     .attr('stroke-dashoffset', 0)
                     .attr('opacity', 0.6);
@@ -446,7 +444,7 @@ export default {
                 yoyo: true,
                 repeat: -1,
             });
-            this._breatheTweens.push(tw);
+            trackTween(this, tw, 'breatheTweens');
         });
 
         halos.forEach((halo, i) => {
@@ -461,7 +459,7 @@ export default {
                 yoyo: true,
                 repeat: -1,
             });
-            this._breatheTweens.push(tw);
+            trackTween(this, tw, 'breatheTweens');
         });
 
         // Add a subtle shimmer to labels
@@ -476,35 +474,27 @@ export default {
                 yoyo: true,
                 repeat: -1,
             });
-            this._glowTweens.push(tw);
+            trackTween(this, tw, 'glowTweens');
         });
     },
 
     cleanup() {
-        // Clear all timeouts
-        this._timeouts.forEach(tid => clearTimeout(tid));
-        this._timeouts = [];
-
-        // Kill breathing tweens
-        this._breatheTweens.forEach(tw => tw.kill());
-        this._breatheTweens = [];
-
-        // Kill glow tweens
-        this._glowTweens.forEach(tw => tw.kill());
-        this._glowTweens = [];
+        clearTrackedTimeouts(this);
+        killTrackedTweens(this);
 
         // Clear D3 SVG content
         d3.select('.scatter-plot').selectAll('*').remove();
 
-        // Kill any lingering GSAP tweens on our elements
-        gsap.killTweensOf('.s3-pill');
-        gsap.killTweensOf('.s3-morph-arrow');
-        gsap.killTweensOf('.s3-vector-display');
-        gsap.killTweensOf('.s3-transform-row');
-        gsap.killTweensOf('.s3-token-transform');
-        gsap.killTweensOf('.s3-scatter-container');
-        gsap.killTweensOf('.orb-core');
-        gsap.killTweensOf('.orb-halo');
-        gsap.killTweensOf('.orb-label');
+        cleanupGsapSelectors([
+            '.s3-pill',
+            '.s3-morph-arrow',
+            '.s3-vector-display',
+            '.s3-transform-row',
+            '.s3-token-transform',
+            '.s3-scatter-container',
+            '.orb-core',
+            '.orb-halo',
+            '.orb-label',
+        ]);
     },
 };

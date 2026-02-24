@@ -1,8 +1,7 @@
+import { trackTimeout, clearTrackedTimeouts, trackTween, killTrackedTweens, cleanupGsapSelectors } from './step-lifecycle.js';
 import { SAMPLE_TEXT, TOKENS, NARRATIONS } from '../config.js';
 
 export default {
-    _timeouts: [],
-    _floatTweens: [],
     _particleEls: [],
 
     build(container) {
@@ -206,7 +205,7 @@ export default {
                         repeat: 1,
                     });
                 }, delayMs);
-                this._timeouts.push(tid);
+                trackTimeout(this, tid);
             });
         }, null, '<'); // fire at start of scanner sweep
 
@@ -498,7 +497,7 @@ export default {
                     yoyo: true,
                     repeat: -1,
                 });
-                this._floatTweens.push(tw);
+                trackTween(this, tw, 'floatTweens');
             });
         });
 
@@ -515,13 +514,8 @@ export default {
     },
 
     cleanup() {
-        // Kill all independent float tweens
-        this._floatTweens.forEach(tw => tw.kill());
-        this._floatTweens = [];
-
-        // Clear timeouts
-        this._timeouts.forEach(tid => clearTimeout(tid));
-        this._timeouts = [];
+        clearTrackedTimeouts(this);
+        killTrackedTweens(this);
 
         // Remove lingering particle elements
         this._particleEls.forEach(el => {
@@ -529,14 +523,15 @@ export default {
         });
         this._particleEls = [];
 
-        // Kill GSAP tweens on our elements
-        gsap.killTweensOf('.s2-word');
-        gsap.killTweensOf('.s2-token');
-        gsap.killTweensOf('.s2-token.s2-subword');
-        gsap.killTweensOf('.s2-token-id');
-        gsap.killTweensOf('.s2-scanner');
-        gsap.killTweensOf('.s2-sub-left');
-        gsap.killTweensOf('.s2-sub-right');
-        gsap.killTweensOf('.s2-split-line');
+        cleanupGsapSelectors([
+            '.s2-word',
+            '.s2-token',
+            '.s2-token.s2-subword',
+            '.s2-token-id',
+            '.s2-scanner',
+            '.s2-sub-left',
+            '.s2-sub-right',
+            '.s2-split-line',
+        ]);
     },
 };
