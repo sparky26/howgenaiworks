@@ -5,6 +5,7 @@ export default {
     _independentTweens: [],
     _floatTweens: [],
     _pulseTween: null,
+    _replayCleanup: null,
 
     build(container) {
         const styleId = 'step7-styles';
@@ -249,13 +250,25 @@ export default {
                     <p>The model's knowledge comes entirely from its training data, which may contain biases, errors, or gaps. It has no access to your organization's internal data unless explicitly given. It cannot reason about what it hasn't seen.</p>
                 </div>
             </div>
-            <button class="s7-replay" id="s7-replay" onclick="window.dispatchEvent(new CustomEvent('replay'))">
+            <button class="s7-replay" id="s7-replay">
                 &#8635; Replay from Start
             </button>
             <p class="step-narration">${NARRATIONS.step7}</p>
         `;
 
         container.appendChild(wrapper);
+
+        const replayBtn = wrapper.querySelector('#s7-replay');
+        if (replayBtn) {
+            const handler = () => {
+                window.dispatchEvent(new CustomEvent('replay'));
+            };
+
+            replayBtn.addEventListener('click', handler);
+            this._replayCleanup = () => {
+                replayBtn.removeEventListener('click', handler);
+            };
+        }
     },
 
     enter() {
@@ -353,6 +366,11 @@ export default {
     },
 
     cleanup() {
+        if (this._replayCleanup) {
+            this._replayCleanup();
+            this._replayCleanup = null;
+        }
+
         // Clear all timeouts
         this._timeouts.forEach(tid => clearTimeout(tid));
         this._timeouts = [];
