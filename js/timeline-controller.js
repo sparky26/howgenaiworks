@@ -79,6 +79,9 @@ export class TimelineController {
 
         this.currentStep = index;
 
+        const showStageOverflow = index === 2 || index === 3;
+        this.stage.classList.toggle('stage-overflow-visible', showStageOverflow);
+
         // Update accent color
         const color = STEP_COLORS[index];
         document.documentElement.style.setProperty('--step-accent', color);
