@@ -166,6 +166,15 @@ html, body {
     overflow: hidden;
 }
 
+#stage.stage-overflow-visible {
+    overflow: visible;
+}
+
+#stage.stage-overflow-visible .step-container,
+#stage.stage-overflow-visible .step-visual {
+    overflow: visible;
+}
+
 .step-container {
     width: 100%;
     max-width: var(--stage-max-width);
